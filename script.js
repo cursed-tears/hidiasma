@@ -1,7 +1,7 @@
 let posts = [];
 let news = [];
 let lastMessageTime = 0;
-const WRONG = true;
+const WRONG = false;
 
 function loadData() {
   posts = JSON.parse(localStorage.getItem('posts')) || [];
