@@ -25,7 +25,7 @@
     <!-- Chat Section -->
     <div id="chatSection" class="section">
       <div class="input-container">
-        <input type="text" id="messageInput" placeholder="Type something..." maxlength="2000">
+        <textarea id="messageInput" placeholder="Type something..." maxlength="2000"></textarea>
         <p>Click ENTER to send</p>
       </div>
       <div class="posts" id="postsContainer"></div>
@@ -40,16 +40,12 @@
     <div id="adminSection" class="section hidden">
       <div id="adminPanel">
         <input type="password" id="adminPassword" placeholder="Enter admin password">
-        <button id="adminLogin">Login</button>
       </div>
       <div id="adminControls" class="hidden">
-        <input type="text" id="newsInput" placeholder="Type news..." maxlength="2000">
-        <button id="sendNews">Send News</button>
+        <textarea id="newsInput" placeholder="Type news..." maxlength="2000"></textarea>
         <input type="text" id="deleteNewsById" placeholder="Enter news ID to delete">
-        <button id="deleteNews">Delete News</button>
         <input type="text" id="deleteChatById" placeholder="Enter chat message ID to delete">
-        <button id="deleteChatMessage">Delete Chat Message</button>
-        <button id="clearChat">Clear Chat</button>
+        <input type="text" id="clearChatConfirmation" placeholder="Type 'CLEAR' to clear chat">
       </div>
     </div>
   </div>
