@@ -1,8 +1,7 @@
 let posts = [];
 let news = [];
 let lastMessageTime = 0;
-const adminPassword = "$$hidi0$$"; // Закодированный пароль
-const WRONG = false; // Если true, сервис недоступен
+const WRONG = true;
 
 function loadData() {
   posts = JSON.parse(localStorage.getItem('posts')) || [];
@@ -20,7 +19,7 @@ function displayPosts(containerId, data) {
   data.forEach(item => {
     const postElement = document.createElement('div');
     postElement.className = 'post';
-    postElement.textContent = item.text;
+    postElement.innerHTML = item.text.replace(/\n/g, '<br>'); // Перенос строк
     const timeElement = document.createElement('div');
     timeElement.className = 'post-time';
     timeElement.textContent = `Time: ${item.time} | ID: ${item.id}`;
@@ -77,10 +76,17 @@ function updateHeaderEmoji(sectionId) {
   const emojiMap = {
     chatSection: '💬',
     newsSection: '📰',
-    adminSection: '🔒'
+    adminSection: '🛠️'
   };
-  document.getElementById('headerEmoji').textContent = emojiMap[sectionId];
+  const emojiElement = document.getElementById('headerEmoji');
+  emojiElement.style.opacity = 0;
+  setTimeout(() => {
+    emojiElement.textContent = emojiMap[sectionId];
+    emojiElement.style.opacity = 1;
+  }, 200); // Анимация смены эмоджи
 }
+
+const adminPassword = "$$hidi0$$";
 
 document.addEventListener('DOMContentLoaded', () => {
   if (WRONG) {
@@ -118,9 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Отправка сообщений
   const messageInput = document.getElementById('messageInput');
-  messageInput.addEventListener('keypress', (e) => {
-    const currentTime = Date.now();
-    if (e.key === 'Enter' && messageInput.value.trim()) {
+  messageInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && messageInput.value.trim()) {
+      e.preventDefault();
+      const currentTime = Date.now();
       if (currentTime - lastMessageTime >= 60000) {
         posts.push({ id: generateId(), text: messageInput.value.trim(), time: getCurrentTime() });
         saveData();
@@ -134,71 +141,63 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Админ-панель
-  const adminLogin = document.getElementById('adminLogin');
-  adminLogin.addEventListener('click', () => {
-    const password = document.getElementById('adminPassword').value;
-    if (password === adminPassword) {
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('adminControls').classList.remove('hidden');
-    } else {
-      showCustomMessage('Incorrect password!');
+  const adminPasswordInput = document.getElementById('adminPassword');
+  adminPasswordInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const password = adminPasswordInput.value;
+      if (password === adminPassword) {
+        document.getElementById('adminPanel').classList.add('hidden');
+        document.getElementById('adminControls').classList.remove('hidden');
+      } else {
+        showCustomMessage('Incorrect password!');
+      }
     }
   });
 
-  const sendNews = document.getElementById('sendNews');
-  sendNews.addEventListener('click', () => {
-    const newsText = document.getElementById('newsInput').value.trim();
-    if (newsText) {
-      news.push({ id: generateId(), text: newsText, time: getCurrentTime() });
+  const newsInput = document.getElementById('newsInput');
+  newsInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && newsInput.value.trim()) {
+      e.preventDefault();
+      news.push({ id: generateId(), text: newsInput.value.trim(), time: getCurrentTime() });
       saveData();
       displayPosts('newsContainer', news);
       showCustomMessage('News sent!');
-      document.getElementById('newsInput').value = '';
+      newsInput.value = '';
     }
   });
 
-  const deleteNews = document.getElementById('deleteNews');
-  deleteNews.addEventListener('click', () => {
-    const id = document.getElementById('deleteNewsById').value.trim();
-    news = news.filter(item => item.id !== id);
-    saveData();
-    displayPosts('newsContainer', news);
-    showCustomMessage('News deleted!');
-  });
-
-  const deleteChatMessage = document.getElementById('deleteChatMessage');
-  deleteChatMessage.addEventListener('click', () => {
-    const id = document.getElementById('deleteChatById').value.trim();
-    posts = posts.filter(post => post.id !== id);
-    saveData();
-    displayPosts('postsContainer', posts);
-    showCustomMessage('Chat message deleted!');
-  });
-
-  const clearChat = document.getElementById('clearChat');
-  clearChat.addEventListener('click', () => {
-    posts = [];
-    saveData();
-    displayPosts('postsContainer', posts);
-    showCustomMessage('Chat cleared!');
-  });
-
-  // Обработка ENTER в админ-панели
-  document.getElementById('newsInput').addEventListener('keypress', (e) => {
+  const deleteNewsById = document.getElementById('deleteNewsById');
+  deleteNewsById.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-      sendNews.click();
+      const id = deleteNewsById.value.trim();
+      news = news.filter(item => item.id !== id);
+      saveData();
+      displayPosts('newsContainer', news);
+      showCustomMessage('News deleted!');
+      deleteNewsById.value = '';
     }
   });
 
-  document.getElementById('deleteNewsById').addEventListener('keypress', (e) => {
+  const deleteChatById = document.getElementById('deleteChatById');
+  deleteChatById.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-      deleteNews.click();
+      const id = deleteChatById.value.trim();
+      posts = posts.filter(post => post.id !== id);
+      saveData();
+      displayPosts('postsContainer', posts);
+      showCustomMessage('Chat message deleted!');
+      deleteChatById.value = '';
     }
   });
 
-  document.getElementById('deleteChatById').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      deleteChatMessage.click();
+  const clearChatConfirmation = document.getElementById('clearChatConfirmation');
+  clearChatConfirmation.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && clearChatConfirmation.value.trim().toUpperCase() === 'CLEAR') {
+      posts = [];
+      saveData();
+      displayPosts('postsContainer', posts);
+      showCustomMessage('Chat cleared!');
+      clearChatConfirmation.value = '';
     }
   });
 });
