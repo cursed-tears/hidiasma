@@ -1,18 +1,22 @@
 let posts = [];
 let news = [];
 let lastMessageTime = 0;
-const WRONG = false;
+const adminPassword = "$$hidi0$$";
+const WRONG = false; // Убедитесь, что значение false
 
+// Загрузка данных из localStorage
 function loadData() {
   posts = JSON.parse(localStorage.getItem('posts')) || [];
   news = JSON.parse(localStorage.getItem('news')) || [];
 }
 
+// Сохранение данных в localStorage
 function saveData() {
   localStorage.setItem('posts', JSON.stringify(posts));
   localStorage.setItem('news', JSON.stringify(news));
 }
 
+// Отображение постов
 function displayPosts(containerId, data) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
@@ -28,15 +32,18 @@ function displayPosts(containerId, data) {
   });
 }
 
+// Получение текущего времени
 function getCurrentTime() {
   const now = new Date();
   return `${now.getHours()}:${now.getMinutes()}`;
 }
 
+// Генерация уникального ID
 function generateId() {
   return Math.random().toString(36).substr(2, 9);
 }
 
+// Отображение страницы недоступности
 function showUnavailablePage() {
   document.body.innerHTML = `
     <div class="unavailable-container">
@@ -47,6 +54,7 @@ function showUnavailablePage() {
   `;
 }
 
+// Отображение временного сообщения
 function showCustomMessage(message) {
   const messageElement = document.createElement('div');
   messageElement.className = 'custom-message';
@@ -57,6 +65,7 @@ function showCustomMessage(message) {
   }, 3000);
 }
 
+// Переключение между разделами
 function switchSection(sectionId) {
   document.querySelectorAll('.section').forEach(section => {
     section.classList.add('hidden');
@@ -64,6 +73,7 @@ function switchSection(sectionId) {
   document.getElementById(sectionId).classList.remove('hidden');
 }
 
+// Обновление позиции кнопки переключения
 function updateSwitchButtonPosition(tabId) {
   const tab = document.getElementById(tabId);
   const switchButton = document.getElementById('switchButton');
@@ -72,11 +82,12 @@ function updateSwitchButtonPosition(tabId) {
   switchButton.style.transform = `translateX(${tab.offsetLeft}px)`;
 }
 
+// Обновление эмоджи в шапке
 function updateHeaderEmoji(sectionId) {
   const emojiMap = {
     chatSection: '💬',
     newsSection: '📰',
-    adminSection: '🛠️'
+    adminSection: '🔒'
   };
   const emojiElement = document.getElementById('headerEmoji');
   emojiElement.style.opacity = 0;
@@ -86,17 +97,15 @@ function updateHeaderEmoji(sectionId) {
   }, 200); // Анимация смены эмоджи
 }
 
-const adminPassword = "$$hidi0$$";
-
+// Инициализация приложения
 document.addEventListener('DOMContentLoaded', () => {
   if (WRONG) {
     showUnavailablePage();
-    return;
+    return; // Прекращаем выполнение, если сервис недоступен
   }
 
+  // Загрузка данных и инициализация разделов
   loadData();
-
-  // Инициализация разделов
   switchSection('chatSection');
   updateSwitchButtonPosition('chatTab');
   updateHeaderEmoji('chatSection');
