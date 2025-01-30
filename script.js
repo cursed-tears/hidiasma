@@ -2,7 +2,7 @@ let posts = [];
 let news = [];
 let lastMessageTime = 0;
 const adminPassword = "$$hidi0$$";
-const WRONG = false; // Убедитесь, что значение false
+const WRONG = true; // Убедитесь, что значение false
 
 // Загрузка данных из localStorage
 function loadData() {
